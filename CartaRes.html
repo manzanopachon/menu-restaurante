@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú del Restaurante</title>
+</head>
+<body>
+  <h1>Hola mundo</h1>
+  <p id="info"></p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const restauranteId = params.get('restaurante_id');
+    const mesaId = params.get('id_mesa');
+
+    document.getElementById('info').innerText =
+      `Restaurante ID: ${restauranteId} | Mesa ID: ${mesaId}`;
+  </script>
+</body>
+</html>
