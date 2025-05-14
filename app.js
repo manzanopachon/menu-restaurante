@@ -22,7 +22,7 @@ async function cargarRestaurante() {
     return;
   }
   try {
-    const res = await fetch(`${API_URL}/restaurantes/${restauranteId}`);
+    const res = await fetch(`${API_URL}/restaurantes/${id}`);
     if (!res.ok) throw new Error(res.statusText);
     const data = await res.json();
     console.log("REST:", data);
