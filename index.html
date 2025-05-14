@@ -1,20 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menú del Restaurante</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Hola mundo</h1>
-  <p id="info"></p>
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-4xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4 text-center">Menú del Restaurante</h1>
+    <p id="info" class="text-center mb-6 text-gray-700"></p>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const restauranteId = params.get('restaurante_id');
-    const mesaId = params.get('id_mesa');
+    <div id="menu" class="space-y-6">
+      <!-- Aquí se insertarán dinámicamente las categorías y platos -->
+    </div>
 
-    document.getElementById('info').innerText =
-      `Restaurante ID: ${restauranteId} | Mesa ID: ${mesaId}`;
-  </script>
+    <div class="fixed bottom-4 right-4">
+      <button id="ver-carrito" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-700">
+        Ver carrito
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal del carrito -->
+  <div id="carrito-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-lg">
+      <h2 class="text-xl font-bold mb-4">Tu pedido</h2>
+      <ul id="lista-carrito" class="space-y-2"></ul>
+      <button id="confirmar-pedido" class="mt-4 bg-green-600 text-white w-full py-2 rounded hover:bg-green-700">Confirmar Pedido</button>
+      <button id="cerrar-modal" class="mt-2 text-gray-500 hover:underline w-full">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
