@@ -10,7 +10,7 @@ document.getElementById('info').innerText =
   `Restaurante ID: ${restauranteId} | Mesa ID: ${mesaId}`;
 
 // 3) URL base de tu API (ajusta según despliegue)
-const API_URL = "https://tu-backend.com/api";
+const API_URL = "http://localhost:8080/api";
 
 // 4) Estructura del carrito en memoria
 const carrito = {};
