@@ -85,7 +85,7 @@ function modificarCantidad(platoId, cambio, nombre = '', precio = 0) {
 
   actualizarContador();
 
-  // 🔁 Muy importante para que los platos eliminados no se queden en el DOM
+  // 🔁 Muy importante para que los platos eliminados no se queden en el DOM.
   if (window.location.pathname.includes("carrito.html")) {
     cargarCarrito();
   }
