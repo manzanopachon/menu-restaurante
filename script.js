@@ -1,5 +1,4 @@
-const API_URL = const API_URL = "https://stockwise.fly.dev/api";
-
+const API_URL = "https://stockwise.fly.dev/api";
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("index.html")) cargarPlatos();
   if (window.location.pathname.includes("carrito.html")) cargarCarrito();
