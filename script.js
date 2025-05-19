@@ -1,4 +1,4 @@
-const API_URL = "https://sw-mauri.onrender.com/api";
+const API_URL = "https://localhost:8080/api";
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("index.html")) cargarPlatos();
