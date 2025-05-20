@@ -175,7 +175,16 @@ async function cargarCarrito() {
         // Copiar automáticamente el código al portapapeles
         try {
           await navigator.clipboard.writeText(codigo);
-          console.log("Código copiado al portapapeles:", codigo);
+          // Mostrar animación flotante de "copiado"
+          const copiado = document.getElementById("copiado");
+          copiado.classList.remove("opacity-0");
+          copiado.classList.add("opacity-100");
+          
+          setTimeout(() => {
+            copiado.classList.remove("opacity-100");
+            copiado.classList.add("opacity-0");
+          }, 2000);
+
         } catch (err) {
           console.warn("No se pudo copiar al portapapeles:", err);
         }
