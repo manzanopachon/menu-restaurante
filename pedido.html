@@ -7,39 +7,92 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6 text-gray-800">
-  <h1 class="text-2xl font-bold mb-4 text-center">Consulta tu Pedido</h1>
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6 text-center text-indigo-700">Consulta tu Pedido</h1>
 
-  <div class="max-w-md mx-auto">
-    <input type="text" id="codigo-input" placeholder="Introduce tu código" class="w-full p-2 border rounded mb-4" />
-    <button onclick="buscarPedido()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Buscar</button>
+    <div class="mb-6">
+      <input type="text" id="codigo-input" placeholder="Introduce tu código" class="w-full p-3 border border-gray-300 rounded" />
+      <button onclick="buscarPedido()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">Buscar</button>
+    </div>
 
-    <div id="resultado" class="mt-6"></div>
+    <div id="resultado" class="bg-white shadow rounded p-4 hidden">
+      <h2 class="text-lg font-semibold text-green-700 mb-2">✅ Pedido encontrado</h2>
+      <p><strong>Mesa:</strong> <span id="mesa"></span></p>
+      <p><strong>Total:</strong> <span id="total"></span> €</p>
+      <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+      <p><strong>Estado:</strong> <span id="estado" class="font-semibold px-2 py-1 rounded"></span></p>
+    </div>
+
+    <p id="error" class="text-red-600 text-center font-medium mt-4"></p>
   </div>
 
   <script>
     const API_URL = "https://stockwise.fly.dev/api";
+    let interval = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const codigoAuto = params.get("codigo");
+      if (codigoAuto) {
+        document.getElementById("codigo-input").value = codigoAuto;
+        buscarPedido();
+      }
+    });
 
     async function buscarPedido() {
       const codigo = document.getElementById("codigo-input").value.trim();
-      const resultado = document.getElementById("resultado");
+      if (!codigo) return mostrarError("Introduce un código válido.");
 
-      if (!codigo) return resultado.innerText = "Introduce un código válido.";
-
+      clearInterval(interval);
       try {
         const res = await fetch(`${API_URL}/pedidos/buscar/${codigo}`);
-        if (!res.ok) throw new Error("No encontrado");
+        if (!res.ok) throw new Error();
 
         const pedido = await res.json();
+        document.getElementById("resultado").classList.remove("hidden");
+        document.getElementById("mesa").textContent = pedido.numeroMesa;
+        document.getElementById("total").textContent = pedido.total.toFixed(2);
+        document.getElementById("fecha").textContent = new Date(pedido.fechaHora).toLocaleString();
+        actualizarEstado(codigo, pedido.estadoPedido);
 
-        resultado.innerHTML = `
-          <h2 class="text-lg font-semibold text-green-700">Pedido encontrado</h2>
-          <p>Mesa: ${pedido.numeroMesa}</p>
-          <p>Total: ${pedido.total} €</p>
-          <p>Fecha: ${new Date(pedido.fechaHora).toLocaleString()}</p>
-        `;
+        // Polling cada 5 segundos
+        interval = setInterval(() => actualizarEstado(codigo), 5000);
+        document.getElementById("error").innerText = "";
       } catch (e) {
-        resultado.innerHTML = `<p class="text-red-600 font-medium">❌ Pedido no encontrado</p>`;
+        mostrarError("❌ Pedido no encontrado");
+        document.getElementById("resultado").classList.add("hidden");
       }
+    }
+
+    async function actualizarEstado(codigo, estadoManual = null) {
+      try {
+        const estado = estadoManual || await (await fetch(`${API_URL}/pedidos/estado/${codigo}`)).text();
+        const estadoEl = document.getElementById("estado");
+
+        estadoEl.textContent = estado;
+
+        // Visual styling según estado
+        estadoEl.className = "font-semibold px-2 py-1 rounded";
+        switch (estado) {
+          case "PENDIENTE":
+            estadoEl.classList.add("bg-yellow-100", "text-yellow-800");
+            break;
+          case "EN_PROCESO":
+            estadoEl.classList.add("bg-blue-100", "text-blue-800");
+            break;
+          case "FINALIZADO":
+            estadoEl.classList.add("bg-green-100", "text-green-800");
+            break;
+          default:
+            estadoEl.classList.add("bg-gray-100", "text-gray-600");
+        }
+      } catch {
+        // opcional: mostrar error de polling
+      }
+    }
+
+    function mostrarError(msg) {
+      document.getElementById("error").innerText = msg;
     }
   </script>
 </body>
