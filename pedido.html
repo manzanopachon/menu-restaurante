@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultar Pedido</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 text-gray-800">
+  <h1 class="text-2xl font-bold mb-4 text-center">Consulta tu Pedido</h1>
+
+  <div class="max-w-md mx-auto">
+    <input type="text" id="codigo-input" placeholder="Introduce tu código" class="w-full p-2 border rounded mb-4" />
+    <button onclick="buscarPedido()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Buscar</button>
+
+    <div id="resultado" class="mt-6"></div>
+  </div>
+
+  <script>
+    const API_URL = "https://stockwise.fly.dev/api";
+
+    async function buscarPedido() {
+      const codigo = document.getElementById("codigo-input").value.trim();
+      const resultado = document.getElementById("resultado");
+
+      if (!codigo) return resultado.innerText = "Introduce un código válido.";
+
+      try {
+        const res = await fetch(`${API_URL}/pedidos/buscar/${codigo}`);
+        if (!res.ok) throw new Error("No encontrado");
+
+        const pedido = await res.json();
+
+        resultado.innerHTML = `
+          <h2 class="text-lg font-semibold text-green-700">Pedido encontrado</h2>
+          <p>Mesa: ${pedido.numeroMesa}</p>
+          <p>Total: ${pedido.total} €</p>
+          <p>Fecha: ${new Date(pedido.fechaHora).toLocaleString()}</p>
+        `;
+      } catch (e) {
+        resultado.innerHTML = `<p class="text-red-600 font-medium">❌ Pedido no encontrado</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
