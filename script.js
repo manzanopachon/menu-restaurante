@@ -1,4 +1,5 @@
 const API_URL = "https://stockwise.fly.dev/api";
+
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) cargarPlatos();
   if (window.location.pathname.includes("carrito.html")) cargarCarrito();
@@ -84,13 +85,10 @@ function modificarCantidad(platoId, cambio, nombre = '', precio = 0) {
 
   actualizarContador();
 
-  // 🔁 Muy importante para que los platos eliminados no se queden en el DOM.
   if (window.location.pathname.includes("carrito.html")) {
     cargarCarrito();
   }
 }
-
-
 
 function actualizarContador() {
   const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
@@ -105,7 +103,6 @@ async function cargarCarrito() {
   const mensaje = document.getElementById("mensaje");
   const { restauranteId, mesaId } = getParams();
 
-  // Mostrar nombre del restaurante
   try {
     const res = await fetch(`${API_URL}/restaurantes/${restauranteId}`);
     const restaurante = await res.json();
@@ -144,12 +141,13 @@ async function cargarCarrito() {
   });
 
   const totalPlatos = carrito.reduce((sum, p) => sum + p.cantidad, 0);
- document.getElementById("total-items").innerHTML = `
-  <div class="text-right">
-  <div>${totalPlatos} plato${totalPlatos !== 1 ? 's' : ''} en el carrito</div>
-  <div class="text-lg text-green-700 font-semibold">Total: ${totalEuros.toFixed(2)} €</div>
-</div>
-`;
+  document.getElementById("total-items").innerHTML = `
+    <div class="text-right">
+      <div>${totalPlatos} plato${totalPlatos !== 1 ? 's' : ''} en el carrito</div>
+      <div class="text-lg text-green-700 font-semibold">Total: ${totalEuros.toFixed(2)} €</div>
+    </div>
+  `;
+
   document.getElementById("realizar-pedido").addEventListener("click", async () => {
     const platosIds = [];
     carrito.forEach(p => {
@@ -171,18 +169,30 @@ async function cargarCarrito() {
 
       if (res.ok) {
         localStorage.removeItem("carrito");
-        document.getElementById("modal").classList.remove("hidden");
-
         const data = await res.json();
         const codigo = data.codigoPedido;
-        document.getElementById("modal").innerHTML = `
-        <div class="bg-white p-6 rounded shadow text-center">
-          <h2 class="text-xl font-bold mb-2 text-green-600">✅ Pedido realizado correctamente</h2>
-          <p class="text-gray-700">Tu código de pedido es: <strong>${codigo}</strong></p>
-          <p class="text-gray-500 text-sm">Guárdalo para consultar tu pedido</p>
-        </div>
-      `;
-        
+
+        // Copiar automáticamente el código al portapapeles
+        try {
+          await navigator.clipboard.writeText(codigo);
+          console.log("Código copiado al portapapeles:", codigo);
+        } catch (err) {
+          console.warn("No se pudo copiar al portapapeles:", err);
+        }
+
+        const modal = document.getElementById("modal");
+        modal.innerHTML = `
+          <div class="bg-white p-6 rounded shadow text-center max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-3 text-green-600">✅ Pedido realizado correctamente</h2>
+            <p class="text-gray-800">Tu código de pedido es:</p>
+            <p class="text-2xl font-mono text-purple-700 my-3">${codigo}</p>
+            <p class="text-sm text-gray-500 mb-4">Se ha copiado automáticamente al portapapeles</p>
+            <a href="pedido.html?codigo=${codigo}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mb-3">Ver Pedido</a>
+            <p class="text-gray-500 text-sm">Redirigiendo al menú...</p>
+          </div>
+        `;
+        modal.classList.remove("hidden");
+
         setTimeout(() => {
           window.location.href = `index.html?restaurante_id=${restauranteId}&mesa_id=${mesaId}`;
         }, 5000);
