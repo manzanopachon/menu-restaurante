@@ -173,9 +173,19 @@ async function cargarCarrito() {
         localStorage.removeItem("carrito");
         document.getElementById("modal").classList.remove("hidden");
 
+        const data = await res.json();
+        const codigo = data.codigoPedido;
+        document.getElementById("modal").innerHTML = `
+        <div class="bg-white p-6 rounded shadow text-center">
+          <h2 class="text-xl font-bold mb-2 text-green-600">✅ Pedido realizado correctamente</h2>
+          <p class="text-gray-700">Tu código de pedido es: <strong>${codigo}</strong></p>
+          <p class="text-gray-500 text-sm">Guárdalo para consultar tu pedido</p>
+        </div>
+      `;
+        
         setTimeout(() => {
           window.location.href = `index.html?restaurante_id=${restauranteId}&mesa_id=${mesaId}`;
-        }, 3000);
+        }, 5000);
       } else {
         const error = await res.text();
         mensaje.innerText = `❌ Error al realizar el pedido: ${error}`;
