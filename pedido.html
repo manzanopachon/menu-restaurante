@@ -40,7 +40,7 @@
     });
 
     async function buscarPedido() {
-      const codigo = document.getElementById("codigo-input").value.trim();
+      const codigo = document.getElementById("codigo-input").value.trim().toUpperCase();
       if (!codigo) return mostrarError("Introduce un código válido.");
 
       clearInterval(interval);
