@@ -46,7 +46,9 @@
       clearInterval(interval);
       try {
         const res = await fetch(`${API_URL}/pedidos/buscar/${codigo}`);
-        if (!res.ok) throw new Error();
+        console.log("🟡 RES:", res);
+        if (!res.ok) throw new Error("No encontrado");
+
 
         const pedido = await res.json();
         document.getElementById("resultado").classList.remove("hidden");
