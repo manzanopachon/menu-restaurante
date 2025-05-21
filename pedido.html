@@ -46,21 +46,23 @@
       clearInterval(interval);
       try {
         const res = await fetch(`${API_URL}/pedidos/buscar/${codigo}`);
-        console.log("🟡 RES:", res);
-        if (!res.ok) throw new Error("No encontrado");
+        const text = await res.text();
 
+        console.log("📦 Pedido API Response (raw text):", text);
 
-        const pedido = await res.json();
+        const pedido = JSON.parse(text);
+        if (!pedido || !pedido.codigoPedido) throw new Error("Pedido no válido");
+
         document.getElementById("resultado").classList.remove("hidden");
         document.getElementById("mesa").textContent = pedido.numeroMesa;
-        document.getElementById("total").textContent = pedido.total.toFixed(2);
+        document.getElementById("total").textContent = pedido.total?.toFixed(2) || "0.00";
         document.getElementById("fecha").textContent = new Date(pedido.fechaHora).toLocaleString();
         actualizarEstado(codigo, pedido.estadoPedido);
 
-        // Polling cada 5 segundos
         interval = setInterval(() => actualizarEstado(codigo), 5000);
         document.getElementById("error").innerText = "";
       } catch (e) {
+        console.error("❌ Error al buscar pedido:", e);
         mostrarError("❌ Pedido no encontrado");
         document.getElementById("resultado").classList.add("hidden");
       }
@@ -72,9 +74,8 @@
         const estadoEl = document.getElementById("estado");
 
         estadoEl.textContent = estado;
-
-        // Visual styling según estado
         estadoEl.className = "font-semibold px-2 py-1 rounded";
+
         switch (estado) {
           case "PENDIENTE":
             estadoEl.classList.add("bg-yellow-100", "text-yellow-800");
@@ -88,8 +89,8 @@
           default:
             estadoEl.classList.add("bg-gray-100", "text-gray-600");
         }
-      } catch {
-        // opcional: mostrar error de polling
+      } catch (e) {
+        console.warn("⚠️ Error en el polling del estado:", e);
       }
     }
 
