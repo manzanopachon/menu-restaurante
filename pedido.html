@@ -16,18 +16,21 @@
     </div>
 
     <div id="resultado" class="bg-white shadow rounded p-4 hidden">
-      <h2 class="text-lg font-semibold text-green-700 mb-2 flex items-center gap-2">
-        ✅ Pedido encontrado
-      </h2>
+      <h2 class="text-lg font-semibold text-green-700 mb-2">✅ Pedido encontrado</h2>
       <p><strong>Mesa:</strong> <span id="mesa"></span></p>
       <p><strong>Total:</strong> <span id="total"></span> €</p>
       <p><strong>Fecha:</strong> <span id="fecha"></span></p>
       <p><strong>Estado:</strong> <span id="estado" class="font-semibold px-2 py-1 rounded"></span></p>
 
       <div class="mt-4">
-        <h3 class="font-semibold text-gray-700 mb-2">🍽️ Platos:</h3>
-        <ul id="platos-list" class="list-disc pl-6 text-gray-800"></ul>
+        <h3 class="text-md font-semibold mb-2">🍽️ Platos:</h3>
+        <ul id="platos-list" class="list-disc ml-5 space-y-1"></ul>
       </div>
+
+      <button onclick="llamarCamarero()" class="mt-6 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition w-full">
+        🚨 Llamar al camarero
+      </button>
+      <p id="mensaje-camarero" class="text-green-700 text-center mt-2 hidden">✅ El camarero ha sido notificado.</p>
     </div>
 
     <p id="error" class="text-red-600 text-center font-medium mt-4"></p>
@@ -56,25 +59,29 @@
         if (!res.ok) throw new Error("No encontrado");
 
         const pedido = await res.json();
-
-        // Mostramos la info
-        document.getElementById("resultado").classList.remove("hidden");
         document.getElementById("mesa").textContent = pedido.numeroMesa;
         document.getElementById("total").textContent = pedido.total.toFixed(2);
         document.getElementById("fecha").textContent = new Date(pedido.fechaHora).toLocaleString();
         actualizarEstado(codigo, pedido.estadoPedido);
 
-        // Mostrar los nombres de los platos
+        // Mostrar platos
         const platosList = document.getElementById("platos-list");
-        platosList.innerHTML = ""; // Limpiar anteriores
-        pedido.nombresPlatos.forEach(nombre => {
+        platosList.innerHTML = "";
+        pedido.detallesPlatos.forEach(plato => {
           const li = document.createElement("li");
-          li.textContent = nombre;
+          li.classList.add("flex", "justify-between", "items-center");
+          li.innerHTML = `
+            <span>${plato.nombre}</span>
+            <span class="text-sm text-gray-500">${plato.precio.toFixed(2)} €</span>
+          `;
           platosList.appendChild(li);
         });
 
-        interval = setInterval(() => actualizarEstado(codigo), 5000);
+        document.getElementById("resultado").classList.remove("hidden");
         document.getElementById("error").innerText = "";
+
+        // Polling cada 5 seg
+        interval = setInterval(() => actualizarEstado(codigo), 5000);
       } catch (e) {
         mostrarError("❌ Pedido no encontrado");
         document.getElementById("resultado").classList.add("hidden");
@@ -86,29 +93,30 @@
         const estado = estadoManual || await (await fetch(`${API_URL}/pedidos/estado/${codigo}`)).text();
         const estadoEl = document.getElementById("estado");
 
-        estadoEl.textContent = estado;
-        estadoEl.className = "font-semibold px-2 py-1 rounded";
+        estadoEl.textContent = {
+          "PENDIENTE": "🟡 PENDIENTE",
+          "EN_PROCESO": "🔵 EN PROCESO",
+          "FINALIZADO": "✅ FINALIZADO"
+        }[estado] || estado;
 
-        switch (estado) {
-          case "PENDIENTE":
-            estadoEl.classList.add("bg-yellow-100", "text-yellow-800");
-            break;
-          case "EN_PROCESO":
-            estadoEl.classList.add("bg-blue-100", "text-blue-800");
-            break;
-          case "FINALIZADO":
-            estadoEl.classList.add("bg-green-100", "text-green-800");
-            break;
-          default:
-            estadoEl.classList.add("bg-gray-100", "text-gray-600");
-        }
-      } catch {
-        // Error opcional
-      }
+        estadoEl.className = "font-semibold px-2 py-1 rounded";
+        estadoEl.classList.add(
+          estado === "PENDIENTE" ? "bg-yellow-100 text-yellow-800" :
+          estado === "EN_PROCESO" ? "bg-blue-100 text-blue-800" :
+          estado === "FINALIZADO" ? "bg-green-100 text-green-800" :
+          "bg-gray-100 text-gray-600"
+        );
+      } catch {}
     }
 
     function mostrarError(msg) {
       document.getElementById("error").innerText = msg;
+    }
+
+    function llamarCamarero() {
+      const msg = document.getElementById("mensaje-camarero");
+      msg.classList.remove("hidden");
+      setTimeout(() => msg.classList.add("hidden"), 4000);
     }
   </script>
 </body>
