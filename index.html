@@ -5,16 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carta del Restaurante</title>
 
-  <!-- Pre aplicar dark si ya se activó -->
-  <script>
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-    }
-  </script>
-
+  <!-- Tailwind + Animate -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  
   <style>
     body { font-family: 'Poppins', sans-serif; }
   </style>
@@ -33,7 +28,7 @@
     </button>
   </div>
 
-  <!-- Contenido -->
+  <!-- Contenido principal -->
   <div class="p-4">
     <h1 id="restaurante-info" class="text-4xl font-bold italic mb-6 text-center text-orange-600 dark:text-orange-300 drop-shadow-md"></h1>
     <a href="pedido.html" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">📦 Ver Pedido</a>
@@ -42,27 +37,36 @@
     <div class="pb-24"></div>
   </div>
 
-  <!-- Footer con total y botón -->
+  <!-- Footer fijo -->
   <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-700 shadow-lg p-4 flex justify-between items-center border-t border-gray-200 dark:border-gray-600 z-50">
     <span id="total-items" class="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
     <a href="#" id="ver-carrito" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition">🛒 Ver Carrito</a>
   </div>
 
-  <!-- JS modo oscuro -->
+  <!-- JS Dark Mode -->
   <script>
     function toggleDarkMode() {
-      const isDark = document.documentElement.classList.contains("dark");
+      const html = document.documentElement;
+      const isDark = html.classList.contains("dark");
+
       if (isDark) {
-        document.documentElement.classList.remove("dark");
+        html.classList.remove("dark");
         localStorage.setItem("darkMode", "false");
       } else {
-        document.documentElement.classList.add("dark");
+        html.classList.add("dark");
         localStorage.setItem("darkMode", "true");
       }
     }
+
+    // Al cargar, aplicar si está guardado
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("darkMode") === "true") {
+        document.documentElement.classList.add("dark");
+      }
+    });
   </script>
 
-  <!-- Script principal -->
+  <!-- Script de la app -->
   <script src="script.js"></script>
 </body>
 </html>
