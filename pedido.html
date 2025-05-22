@@ -4,28 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Consultar Pedido</title>
-  <!-- Animate.css -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+  </style>
 </head>
-<body class="bg-gray-100 p-6 text-gray-800">
-  <!-- Botón modo oscuro -->
-<div class="fixed bottom-6 right-6 z-50">
-  <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
-    🌙
-  </button>
-</div>
-  <div class="max-w-xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6 text-center text-indigo-700">Consulta tu Pedido</h1>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6">
+  <!-- Dark Mode Toggle -->
+  <div class="fixed bottom-6 right-6 z-50">
+    <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
+      🌙
+    </button>
+  </div>
+
+  <div class="max-w-xl mx-auto animate__animated animate__fadeIn">
+    <h1 class="text-3xl font-bold mb-6 text-center text-indigo-700 dark:text-indigo-300">Consulta tu Pedido</h1>
 
     <div class="mb-6">
-      <input type="text" id="codigo-input" placeholder="Introduce tu código" class="w-full p-3 border border-gray-300 rounded" />
+      <input type="text" id="codigo-input" placeholder="Introduce tu código"
+        class="w-full p-3 border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600" />
       <button onclick="buscarPedido()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">Buscar</button>
     </div>
 
-    <div id="resultado" class="bg-white shadow rounded p-4 hidden">
-      <h2 class="text-lg font-semibold text-green-700 mb-2">✅ Pedido encontrado</h2>
+    <div id="resultado" class="bg-white dark:bg-gray-800 shadow rounded p-4 hidden">
+      <h2 class="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">✅ Pedido encontrado</h2>
       <p><strong>Mesa:</strong> <span id="mesa"></span></p>
       <p><strong>Total:</strong> <span id="total"></span> €</p>
       <p><strong>Fecha:</strong> <span id="fecha"></span></p>
@@ -39,10 +43,10 @@
       <button onclick="llamarCamarero()" class="mt-6 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition w-full">
         🚨 Llamar al camarero
       </button>
-      <p id="mensaje-camarero" class="text-green-700 text-center mt-2 hidden">✅ El camarero ha sido notificado.</p>
+      <p id="mensaje-camarero" class="text-green-600 dark:text-green-400 text-center mt-2 hidden">✅ El camarero ha sido notificado.</p>
     </div>
 
-    <p id="error" class="text-red-600 text-center font-medium mt-4"></p>
+    <p id="error" class="text-red-600 dark:text-red-400 text-center font-medium mt-4"></p>
   </div>
 
   <script>
@@ -50,6 +54,7 @@
     let interval = null;
 
     document.addEventListener("DOMContentLoaded", () => {
+      applyDarkMode();
       const params = new URLSearchParams(window.location.search);
       const codigoAuto = params.get("codigo");
       if (codigoAuto) {
@@ -73,23 +78,17 @@
         document.getElementById("fecha").textContent = new Date(pedido.fechaHora).toLocaleString();
         actualizarEstado(codigo, pedido.estadoPedido);
 
-        // Mostrar platos
         const platosList = document.getElementById("platos-list");
         platosList.innerHTML = "";
         pedido.detallesPlatos.forEach(plato => {
           const li = document.createElement("li");
           li.classList.add("flex", "justify-between", "items-center");
-          li.innerHTML = `
-            <span>${plato.nombre}</span>
-            <span class="text-sm text-gray-500">${plato.precio.toFixed(2)} €</span>
-          `;
+          li.innerHTML = `<span>${plato.nombre}</span><span class="text-sm text-gray-500 dark:text-gray-400">${plato.precio.toFixed(2)} €</span>`;
           platosList.appendChild(li);
         });
 
         document.getElementById("resultado").classList.remove("hidden");
         document.getElementById("error").innerText = "";
-
-        // Polling cada 5 seg
         interval = setInterval(() => actualizarEstado(codigo), 5000);
       } catch (e) {
         mostrarError("❌ Pedido no encontrado");
@@ -101,7 +100,6 @@
       try {
         const estado = estadoManual || await (await fetch(`${API_URL}/pedidos/estado/${codigo}`)).text();
         const estadoEl = document.getElementById("estado");
-
         estadoEl.textContent = {
           "PENDIENTE": "🟡 PENDIENTE",
           "EN_PROCESO": "🔵 EN PROCESO",
@@ -127,23 +125,17 @@
       msg.classList.remove("hidden");
       setTimeout(() => msg.classList.add("hidden"), 4000);
     }
+
+    function applyDarkMode() {
+      const isDark = localStorage.getItem("darkMode") === "true";
+      document.documentElement.classList.toggle("dark", isDark);
+    }
+
+    function toggleDarkMode() {
+      const current = localStorage.getItem("darkMode") === "true";
+      localStorage.setItem("darkMode", !current);
+      applyDarkMode();
+    }
   </script>
-  <script>
-  // Modo oscuro
-  function applyDarkMode() {
-    const isDark = localStorage.getItem("darkMode") === "true";
-    document.documentElement.classList.toggle("dark", isDark);
-  }
-
-  function toggleDarkMode() {
-    const current = localStorage.getItem("darkMode") === "true";
-    localStorage.setItem("darkMode", !current);
-    applyDarkMode();
-  }
-
-  // Aplicar al cargar
-  document.addEventListener("DOMContentLoaded", applyDarkMode);
-</script>
-
 </body>
 </html>
