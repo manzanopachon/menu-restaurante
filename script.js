@@ -40,7 +40,8 @@ document.getElementById("loader").classList.add("hidden");
     categorias[categoria].forEach(plato => {
       const cantidad = getCantidadCarrito(plato.id);
       const card = document.createElement("div");
-      card.className = "bg-white p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200 mb-4";
+      card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200 mb-4";
+
       card.innerHTML = `
         <div>
           <h3 class="font-bold">${plato.nombre}</h3>
