@@ -188,6 +188,7 @@ async function cargarCarrito() {
         } catch (err) {
           console.warn("No se pudo copiar al portapapeles:", err);
         }
+        document.getElementById("sound-success").play();
 
         const modal = document.getElementById("modal");
         modal.innerHTML = `
