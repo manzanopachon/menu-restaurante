@@ -32,33 +32,51 @@ document.getElementById("loader").classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
   ordenDeseado.forEach(categoria => {
-    if (!categorias[categoria]) return;
-    const section = document.createElement("div");
-    section.classList.add("mb-6");
-    section.innerHTML = `<h2 class="text-2xl font-semibold text-pink-600 mb-3 border-b pb-1">${categoria}</h2>`;
+  if (!categorias[categoria]) return;
 
-    categorias[categoria].forEach(plato => {
-      const cantidad = getCantidadCarrito(plato.id);
-      const card = document.createElement("div");
-      card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200 mb-4";
+  const section = document.createElement("div");
+  section.classList.add("mb-6");
 
-      card.innerHTML = `
-        <div>
-          <h3 class="font-bold">${plato.nombre}</h3>
-          <p class="text-sm">${plato.descripcion}</p>
-          <span class="text-blue-600 font-semibold">${plato.precio} €</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
-          <span id="contador-${plato.id}" class="w-6 text-center">${cantidad}</span>
-          <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
-        </div>
-      `;
-      section.appendChild(card);
-    });
+  // Botón de cabecera clicable
+  const header = document.createElement("button");
+  header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
+  header.textContent = categoria;
 
-    contenedor.appendChild(section);
+  // Contenedor oculto inicialmente
+  const content = document.createElement("div");
+  content.className = "space-y-4 mt-2 hidden";
+
+  categorias[categoria].forEach(plato => {
+    const cantidad = getCantidadCarrito(plato.id);
+    const card = document.createElement("div");
+    card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
+
+    card.innerHTML = `
+      <div>
+        <h3 class="font-bold">${plato.nombre}</h3>
+        <p class="text-sm">${plato.descripcion}</p>
+        <span class="text-blue-600 font-semibold">${plato.precio} €</span>
+      </div>
+      <div class="flex items-center gap-2 mt-2">
+        <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
+        <span id="contador-${plato.id}" class="w-6 text-center">${cantidad}</span>
+        <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
+      </div>
+    `;
+
+    content.appendChild(card);
   });
+
+  // Toggle al pulsar el título
+  header.addEventListener("click", () => {
+    content.classList.toggle("hidden");
+  });
+
+  section.appendChild(header);
+  section.appendChild(content);
+  contenedor.appendChild(section);
+});
+
 
   actualizarContador();
 }
