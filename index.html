@@ -18,8 +18,8 @@
     <p class="text-lg text-gray-500 dark:text-gray-300">🍽️ Cargando carta...</p>
   </div>
 
-  <!-- Botón modo oscuro (izquierda) -->
-  <div class="fixed bottom-6 left-6 z-50">
+  <!-- Botón modo oscuro -->
+  <div class="fixed top-4 left-4 z-50">
     <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
       🌙
     </button>
@@ -30,7 +30,7 @@
     <h1 id="restaurante-info" class="text-4xl font-bold italic mb-6 text-center text-orange-600 dark:text-orange-300 drop-shadow-md"></h1>
     <a href="pedido.html" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">📦 Ver Pedido</a>
 
-    <div id="platos-container" class="space-y-6"></div>
+    <div id="platos-container" class="space-y-6 animate__animated animate__fadeIn"></div>
     <div class="pb-24"></div>
   </div>
 
@@ -46,14 +46,17 @@
       const isDark = localStorage.getItem("darkMode") === "true";
       document.documentElement.classList.toggle("dark", isDark);
     }
+
     function toggleDarkMode() {
       const current = localStorage.getItem("darkMode") === "true";
       localStorage.setItem("darkMode", !current);
       applyDarkMode();
     }
+
     document.addEventListener("DOMContentLoaded", applyDarkMode);
   </script>
 
+  <!-- Script principal -->
   <script src="script.js"></script>
 </body>
 </html>
