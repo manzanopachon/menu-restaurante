@@ -27,7 +27,7 @@ async function cargarPlatos() {
     categorias[cat].push(plato);
   });
 
-  const ordenDeseado = ['Entrantes', 'Pasta', 'Pizzas', 'Carnes', 'Pescado', 'Postres', 'Bebidas'];
+  const ordenDeseado = ['Entrantes', 'Pastas', 'Pizzas', 'Carnes', 'Pescados', 'Postres', 'Bebidas'];
 document.getElementById("loader").classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
