@@ -1,141 +1,86 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Consultar Pedido</title>
+  <title>Carrito</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
+
+  <!-- Estilo + Animate.css -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
   <style>
     body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6">
-  <!-- Dark Mode Toggle -->
-  <div class="fixed bottom-6 right-6 z-50">
+<body class="bg-orange-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-4">
+
+  <!-- Botón modo oscuro -->
+  <div class="fixed top-16 left-4 z-50">
     <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
       🌙
     </button>
   </div>
 
-  <div class="max-w-xl mx-auto animate__animated animate__fadeIn">
-    <h1 class="text-3xl font-bold mb-6 text-center text-indigo-700 dark:text-indigo-300">Consulta tu Pedido</h1>
+  <!-- Título -->
+  <h1 id="titulo-restaurante" class="text-3xl font-bold text-center text-orange-700 dark:text-orange-300 mb-6 drop-shadow-sm"></h1>
 
-    <div class="mb-6">
-      <input type="text" id="codigo-input" placeholder="Introduce tu código"
-        class="w-full p-3 border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600" />
-      <button onclick="buscarPedido()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">Buscar</button>
-    </div>
+  <!-- Lista de productos -->
+  <div id="carrito-items" class="space-y-5 mb-8"></div>
 
-    <div id="resultado" class="bg-white dark:bg-gray-800 shadow rounded p-4 hidden">
-      <h2 class="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">✅ Pedido encontrado</h2>
-      <p><strong>Mesa:</strong> <span id="mesa"></span></p>
-      <p><strong>Total:</strong> <span id="total"></span> €</p>
-      <p><strong>Fecha:</strong> <span id="fecha"></span></p>
-      <p><strong>Estado:</strong> <span id="estado" class="font-semibold px-2 py-1 rounded"></span></p>
-
-      <div class="mt-4">
-        <h3 class="text-md font-semibold mb-2">🍽️ Platos:</h3>
-        <ul id="platos-list" class="list-disc ml-5 space-y-1"></ul>
-      </div>
-
-      <button onclick="llamarCamarero()" class="mt-6 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition w-full">
-        🚨 Llamar al camarero
-      </button>
-      <p id="mensaje-camarero" class="text-green-600 dark:text-green-400 text-center mt-2 hidden">✅ El camarero ha sido notificado.</p>
-    </div>
-
-    <p id="error" class="text-red-600 dark:text-red-400 text-center font-medium mt-4"></p>
+  <!-- Totales + botón -->
+  <div class="flex justify-between items-center mb-6">
+    <span id="total-items" class="text-sm text-gray-800 dark:text-gray-300 font-semibold"></span>
+    <button id="realizar-pedido" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition">✅ Realizar pedido</button>
   </div>
 
+  <!-- Modal confirmación -->
+  <div id="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <!-- Se rellena por JS -->
+  </div>
+
+  <!-- Toast de copiado -->
+  <div id="copiado" class="fixed top-6 right-6 bg-green-600 text-white px-4 py-2 rounded shadow-lg text-sm opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    ✅ Código copiado
+  </div>
+
+  <!-- Sonido -->
+  <audio id="sound-success" src="https://www.myinstants.com/media/sounds/success-fanfare.mp3" preload="auto"></audio>
+
+  <!-- Error de conexión o pedido -->
+  <p id="mensaje" class="mt-6 text-center font-semibold text-red-600 dark:text-red-400"></p>
+
+  <!-- Modo oscuro sincronizado -->
   <script>
-    const API_URL = "https://stockwise.fly.dev/api";
-    let interval = null;
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains("dark");
+
+      if (isDark) {
+        html.classList.remove("dark");
+        localStorage.setItem("darkMode", "false");
+      } else {
+        html.classList.add("dark");
+        localStorage.setItem("darkMode", "true");
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
-      applyDarkMode();
-      const params = new URLSearchParams(window.location.search);
-      const codigoAuto = params.get("codigo");
-      if (codigoAuto) {
-        document.getElementById("codigo-input").value = codigoAuto;
-        buscarPedido();
+      if (localStorage.getItem("darkMode") === "true") {
+        document.documentElement.classList.add("dark");
       }
     });
-
-    async function buscarPedido() {
-      const codigo = document.getElementById("codigo-input").value.trim().toUpperCase();
-      if (!codigo) return mostrarError("Introduce un código válido.");
-
-      clearInterval(interval);
-      try {
-        const res = await fetch(`${API_URL}/pedidos/buscar/${codigo}`);
-        if (!res.ok) throw new Error("No encontrado");
-
-        const pedido = await res.json();
-        document.getElementById("mesa").textContent = pedido.numeroMesa;
-        document.getElementById("total").textContent = pedido.total.toFixed(2);
-        document.getElementById("fecha").textContent = new Date(pedido.fechaHora).toLocaleString();
-        actualizarEstado(codigo, pedido.estadoPedido);
-
-        const platosList = document.getElementById("platos-list");
-        platosList.innerHTML = "";
-        pedido.detallesPlatos.forEach(plato => {
-          const li = document.createElement("li");
-          li.classList.add("flex", "justify-between", "items-center");
-          li.innerHTML = `<span>${plato.nombre}</span><span class="text-sm text-gray-500 dark:text-gray-400">${plato.precio.toFixed(2)} €</span>`;
-          platosList.appendChild(li);
-        });
-
-        document.getElementById("resultado").classList.remove("hidden");
-        document.getElementById("error").innerText = "";
-        interval = setInterval(() => actualizarEstado(codigo), 5000);
-      } catch (e) {
-        mostrarError("❌ Pedido no encontrado");
-        document.getElementById("resultado").classList.add("hidden");
-      }
-    }
-
-    async function actualizarEstado(codigo, estadoManual = null) {
-      try {
-        const estado = estadoManual || await (await fetch(`${API_URL}/pedidos/estado/${codigo}`)).text();
-        const estadoEl = document.getElementById("estado");
-        estadoEl.textContent = {
-          "PENDIENTE": "🟡 PENDIENTE",
-          "EN_PROCESO": "🔵 EN PROCESO",
-          "FINALIZADO": "✅ FINALIZADO"
-        }[estado] || estado;
-
-        estadoEl.className = "font-semibold px-2 py-1 rounded";
-        estadoEl.classList.add(
-          estado === "PENDIENTE" ? "bg-yellow-100 text-yellow-800" :
-          estado === "EN_PROCESO" ? "bg-blue-100 text-blue-800" :
-          estado === "FINALIZADO" ? "bg-green-100 text-green-800" :
-          "bg-gray-100 text-gray-600"
-        );
-      } catch {}
-    }
-
-    function mostrarError(msg) {
-      document.getElementById("error").innerText = msg;
-    }
-
-    function llamarCamarero() {
-      const msg = document.getElementById("mensaje-camarero");
-      msg.classList.remove("hidden");
-      setTimeout(() => msg.classList.add("hidden"), 4000);
-    }
-
-    function applyDarkMode() {
-      const isDark = localStorage.getItem("darkMode") === "true";
-      document.documentElement.classList.toggle("dark", isDark);
-    }
-
-    function toggleDarkMode() {
-      const current = localStorage.getItem("darkMode") === "true";
-      localStorage.setItem("darkMode", !current);
-      applyDarkMode();
-    }
   </script>
+
+  <!-- Tu lógica -->
+  <script src="script.js"></script>
 </body>
 </html>
