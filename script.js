@@ -20,14 +20,30 @@ async function cargarPlatos() {
   const res = await fetch(`${API_URL}/platos/restaurante/${restauranteId}`);
   const platos = await res.json();
 
-  const categorias = {};
-  platos.forEach((plato) => {
-    const cat = plato.categoria?.nombre || "Otros";
-    if (!categorias[cat]) categorias[cat] = [];
-    categorias[cat].push(plato);
-  });
+  const categorias = {
+  1: [], // Entrantes
+  2: [], // Pizzas
+  3: [], // Pastas
+  4: [], // Carnes
+  5: [], // Pescados
+  6: [], // Postres
+  7: []  // Bebidas
+};
 
-  const ordenDeseado = ['Entrantes', 'Pastas', 'Pizzas', 'Carnes', 'Pescados', 'Postres', 'Bebidas'];
+const nombresCategorias = {
+  1: "Entrantes",
+  2: "Pizzas",
+  3: "Pastas",
+  4: "Carnes",
+  5: "Pescados",
+  6: "Postres",
+  7: "Bebidas"
+};
+
+platos.forEach(plato => {
+  const idCat = plato.categoria?.id;
+  if (categorias[idCat]) categorias[idCat].push(plato);
+});
 document.getElementById("loader").classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
