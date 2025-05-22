@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carta del Restaurante</title>
 
-  <!-- Configuración de Tailwind: modo oscuro por clase -->
+  <!-- Carga Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Configuración de Tailwind: usar modo oscuro por clase -->
   <script>
     tailwind.config = {
       darkMode: 'class'
     };
   </script>
 
-  <!-- Carga Tailwind y extras -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts + Animate.css -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
@@ -23,19 +25,19 @@
 </head>
 <body class="bg-gradient-to-b from-orange-50 to-white dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100 min-h-screen">
 
-  <!-- Loader -->
+  <!-- Pantalla de carga -->
   <div id="loader" class="text-center animate-pulse py-10">
     <p class="text-lg text-gray-500 dark:text-gray-300">🍽️ Cargando carta...</p>
   </div>
 
-  <!-- Botón Dark Mode -->
+  <!-- Botón de modo oscuro -->
   <div class="fixed top-16 left-4 z-50">
     <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
       🌙
     </button>
   </div>
 
-  <!-- Contenido -->
+  <!-- Contenido principal -->
   <div class="p-4">
     <h1 id="restaurante-info" class="text-4xl font-bold italic mb-6 text-center text-orange-600 dark:text-orange-300 drop-shadow-md"></h1>
     <a href="pedido.html" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">📦 Ver Pedido</a>
@@ -44,13 +46,13 @@
     <div class="pb-24"></div>
   </div>
 
-  <!-- Footer -->
+  <!-- Footer fijo -->
   <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-700 shadow-lg p-4 flex justify-between items-center border-t border-gray-200 dark:border-gray-600 z-50">
     <span id="total-items" class="text-sm font-medium text-gray-700 dark:text-gray-300"></span>
     <a href="#" id="ver-carrito" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition">🛒 Ver Carrito</a>
   </div>
 
-  <!-- JS: Dark Mode control -->
+  <!-- Script de modo oscuro -->
   <script>
     function toggleDarkMode() {
       const html = document.documentElement;
@@ -72,7 +74,7 @@
     });
   </script>
 
-  <!-- Tu script principal -->
+  <!-- Tu lógica principal -->
   <script src="script.js"></script>
 </body>
 </html>
