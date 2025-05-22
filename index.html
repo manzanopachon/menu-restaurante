@@ -10,20 +10,18 @@
     body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
-<body class="bg-gradient-to-b from-gray-100 to-gray-200 text-gray-800">
+<body class="bg-gradient-to-b from-orange-50 to-white text-gray-800 min-h-screen">
   <div class="p-4">
-    <h1 id="restaurante-info" class="text-3xl font-extrabold italic underline mb-4 text-center text-indigo-700"></h1>
-    <a href="pedido.html" class="fixed top-4 right-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">Ver Pedido</a>
+    <h1 id="restaurante-info" class="text-4xl font-bold italic mb-6 text-center text-orange-600 drop-shadow-md"></h1>
+    <a href="pedido.html" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">📦 Ver Pedido</a>
 
-    
-
-    <div id="platos-container"></div>
-    <div class="pb-20"></div>
+    <div id="platos-container" class="space-y-6"></div>
+    <div class="pb-24"></div>
   </div>
 
-  <div class="fixed bottom-0 left-0 right-0 bg-white shadow p-4 flex justify-between items-center border-t">
-    <span id="total-items" class="text-sm"></span>
-    <a href="carrito.html" id="ver-carrito" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">Ver carrito</a>
+  <div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 flex justify-between items-center border-t border-gray-200 z-50">
+    <span id="total-items" class="text-sm font-medium text-gray-700"></span>
+    <a href="#" id="ver-carrito" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition">🛒 Ver Carrito</a>
   </div>
 
   <script src="script.js"></script>
