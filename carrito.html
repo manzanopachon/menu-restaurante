@@ -1,66 +1,86 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carrito</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
+
+  <!-- Estilo + Animate.css -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Animate.css -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <style>
     body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
-<body class="bg-orange-50 text-gray-900 min-h-screen p-4">
-  <!-- Botón modo oscuro -->
-  <div class="fixed bottom-6 right-6 z-50">
-  <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
-    🌙
-  </button>
-</div>
-  <h1 id="titulo-restaurante" class="text-3xl font-bold text-center text-orange-700 mb-6 drop-shadow-sm"></h1>
+<body class="bg-orange-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-4">
 
+  <!-- Botón modo oscuro -->
+  <div class="fixed top-16 left-4 z-50">
+    <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
+      🌙
+    </button>
+  </div>
+
+  <!-- Título -->
+  <h1 id="titulo-restaurante" class="text-3xl font-bold text-center text-orange-700 dark:text-orange-300 mb-6 drop-shadow-sm"></h1>
+
+  <!-- Lista de productos -->
   <div id="carrito-items" class="space-y-5 mb-8"></div>
 
+  <!-- Totales + botón -->
   <div class="flex justify-between items-center mb-6">
-    <span id="total-items" class="text-sm text-gray-800 font-semibold"></span>
+    <span id="total-items" class="text-sm text-gray-800 dark:text-gray-300 font-semibold"></span>
     <button id="realizar-pedido" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition">✅ Realizar pedido</button>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal confirmación -->
   <div id="modal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <!-- Modal generado por JS -->
+    <!-- Se rellena por JS -->
   </div>
 
-  <!-- Animación copiado -->
+  <!-- Toast de copiado -->
   <div id="copiado" class="fixed top-6 right-6 bg-green-600 text-white px-4 py-2 rounded shadow-lg text-sm opacity-0 pointer-events-none transition-opacity duration-300 z-50">
     ✅ Código copiado
   </div>
 
-  <!-- Sonido éxito -->
+  <!-- Sonido -->
   <audio id="sound-success" src="https://www.myinstants.com/media/sounds/success-fanfare.mp3" preload="auto"></audio>
 
-  <p id="mensaje" class="mt-6 text-center font-semibold text-red-600"></p>
+  <!-- Error de conexión o pedido -->
+  <p id="mensaje" class="mt-6 text-center font-semibold text-red-600 dark:text-red-400"></p>
 
+  <!-- Modo oscuro sincronizado -->
   <script>
-  // Modo oscuro
-  function applyDarkMode() {
-    const isDark = localStorage.getItem("darkMode") === "true";
-    document.documentElement.classList.toggle("dark", isDark);
-  }
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains("dark");
 
-  function toggleDarkMode() {
-    const current = localStorage.getItem("darkMode") === "true";
-    localStorage.setItem("darkMode", !current);
-    applyDarkMode();
-  }
+      if (isDark) {
+        html.classList.remove("dark");
+        localStorage.setItem("darkMode", "false");
+      } else {
+        html.classList.add("dark");
+        localStorage.setItem("darkMode", "true");
+      }
+    }
 
-  // Aplicar al cargar
-  document.addEventListener("DOMContentLoaded", applyDarkMode);
-</script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("darkMode") === "true") {
+        document.documentElement.classList.add("dark");
+      }
+    });
+  </script>
 
+  <!-- Tu lógica -->
   <script src="script.js"></script>
 </body>
 </html>
