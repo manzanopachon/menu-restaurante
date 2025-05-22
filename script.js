@@ -47,22 +47,22 @@ platos.forEach(plato => {
 document.getElementById("loader").classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
-  ordenDeseado.forEach(categoria => {
-  if (!categorias[categoria]) return;
+  Object.keys(categorias).forEach(id => {
+  const categoria = nombresCategorias[id];
+  const platosCat = categorias[id];
+  if (!platosCat || platosCat.length === 0) return;
 
   const section = document.createElement("div");
   section.classList.add("mb-6");
 
-  // Botón de cabecera clicable
   const header = document.createElement("button");
   header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
   header.textContent = categoria;
 
-  // Contenedor oculto inicialmente
   const content = document.createElement("div");
   content.className = "space-y-4 mt-2 hidden";
 
-  categorias[categoria].forEach(plato => {
+  platosCat.forEach(plato => {
     const cantidad = getCantidadCarrito(plato.id);
     const card = document.createElement("div");
     card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
@@ -83,7 +83,6 @@ document.getElementById("loader").classList.add("hidden");
     content.appendChild(card);
   });
 
-  // Toggle al pulsar el título
   header.addEventListener("click", () => {
     content.classList.toggle("hidden");
   });
