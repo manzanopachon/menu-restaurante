@@ -5,16 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carta del Restaurante</title>
 
-    <!-- 🔁 Aplicar darkMode lo antes posible -->
-  <script>
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-    }
-  </script>
-  <!-- Carga Tailwind CSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Configuración de Tailwind: usar modo oscuro por clase -->
   <script>
     tailwind.config = {
       darkMode: 'class'
@@ -31,12 +23,12 @@
 </head>
 <body class="bg-gradient-to-b from-orange-50 to-white dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100 min-h-screen">
 
-  <!-- Pantalla de carga -->
+  <!-- Loader -->
   <div id="loader" class="text-center animate-pulse py-10">
     <p class="text-lg text-gray-500 dark:text-gray-300">🍽️ Cargando carta...</p>
   </div>
 
-  <!-- Botón de modo oscuro -->
+  <!-- Botón modo oscuro -->
   <div class="fixed top-16 left-4 z-50">
     <button onclick="toggleDarkMode()" class="bg-gray-800 dark:bg-yellow-400 text-white dark:text-black p-2 rounded-full shadow-lg transition duration-300 hover:scale-110">
       🌙
@@ -58,29 +50,30 @@
     <a href="#" id="ver-carrito" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition">🛒 Ver Carrito</a>
   </div>
 
-  <!-- Script de modo oscuro -->
+  <!-- JS modo oscuro con sincronización -->
   <script>
+    // Aplicar el modo oscuro al cargar
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+
+    // Cambiar modo
     function toggleDarkMode() {
       const html = document.documentElement;
       const isDark = html.classList.contains("dark");
-
-      if (isDark) {
-        html.classList.remove("dark");
-        localStorage.setItem("darkMode", "false");
-      } else {
-        html.classList.add("dark");
-        localStorage.setItem("darkMode", "true");
-      }
+      html.classList.toggle("dark", !isDark);
+      localStorage.setItem("darkMode", !isDark);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("darkMode") === "true") {
-        document.documentElement.classList.add("dark");
+    // Escuchar cambios desde otras pestañas
+    window.addEventListener("storage", (event) => {
+      if (event.key === "darkMode") {
+        const isDark = event.newValue === "true";
+        document.documentElement.classList.toggle("dark", isDark);
       }
     });
   </script>
 
-  <!-- Tu lógica principal -->
   <script src="script.js"></script>
 </body>
 </html>
