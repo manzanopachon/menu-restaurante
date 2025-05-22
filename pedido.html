@@ -159,11 +159,22 @@
       document.getElementById("error").innerText = msg;
     }
 
-    function llamarCamarero() {
-      const msg = document.getElementById("mensaje-camarero");
-      msg.classList.remove("hidden");
-      setTimeout(() => msg.classList.add("hidden"), 4000);
-    }
+   function llamarCamarero() {
+  const msg = document.getElementById("mensaje-camarero");
+  msg.classList.remove("hidden");
+
+  // Reproducir sonido
+  const sonido = document.getElementById("llamada-sound");
+  if (sonido) {
+    sonido.currentTime = 0;
+    sonido.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  }
+
+  // Ocultar mensaje después de 4 segundos
+  setTimeout(() => msg.classList.add("hidden"), 4000);
+}
+
   </script>
+  <audio id="llamada-sound" src="https://www.myinstants.com/media/sounds/apple-pay.mp3" preload="auto"></audio>
 </body>
 </html>
