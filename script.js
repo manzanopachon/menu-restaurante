@@ -2,21 +2,18 @@ const API_URL = "https://stockwise.fly.dev/api";
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) {
-    // Borra los platos antes de recargar por si ya estaban cargados
     const contenedor = document.getElementById("platos-container");
     if (contenedor) contenedor.innerHTML = "";
 
-    cargarPlatos(); // vuelve a cargar todo desde cero (con cantidad correcta)
+    cargarPlatos();
     actualizarContador();
   }
 
   window.addEventListener("storage", (event) => {
-  if (event.key === "carrito") {
-    actualizarContador(); // se ejecuta al modificar carrito en otra pestaña
-  }
-});
-
-  if (window.location.pathname.includes("carrito.html")) cargarCarrito();
+    if (event.key === "carrito") {
+      actualizarContador();
+    }
+  });
 });
 
 function getParams() {
@@ -35,78 +32,75 @@ async function cargarPlatos() {
   const platos = await res.json();
 
   const categorias = {
-  1: [], // Entrantes
-  2: [], // Pizzas
-  3: [], // Pastas
-  4: [], // Carnes
-  5: [], // Pescados
-  6: [], // Postres
-  7: []  // Bebidas
-};
+    1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []
+  };
 
-const nombresCategorias = {
-  1: "Entrantes",
-  2: "Pizzas",
-  3: "Pastas",
-  4: "Carnes",
-  5: "Pescados",
-  6: "Postres",
-  7: "Bebidas"
-};
+  const nombresCategorias = {
+    1: "Entrantes",
+    2: "Pizzas",
+    3: "Pastas",
+    4: "Carnes",
+    5: "Pescados",
+    6: "Postres",
+    7: "Bebidas"
+  };
 
-platos.forEach(plato => {
-  const idCat = plato.categoria?.id;
-  if (categorias[idCat]) categorias[idCat].push(plato);
-});
-document.getElementById("loader").classList.add("hidden");
+  platos.forEach(plato => {
+    const idCat = plato.categoria?.id;
+    if (categorias[idCat]) categorias[idCat].push(plato);
+  });
+
+  document.getElementById("loader")?.classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
   Object.keys(categorias).forEach(id => {
-  const categoria = nombresCategorias[id];
-  const platosCat = categorias[id];
-  if (!platosCat || platosCat.length === 0) return;
+    const categoria = nombresCategorias[id];
+    const platosCat = categorias[id];
+    if (!platosCat.length) return;
 
-  const section = document.createElement("div");
-  section.classList.add("mb-6");
+    const section = document.createElement("div");
+    section.classList.add("mb-6");
 
-  const header = document.createElement("button");
-  header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
-  header.textContent = categoria;
+    const header = document.createElement("button");
+    header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
+    header.textContent = categoria;
 
-  const content = document.createElement("div");
-  content.className = "space-y-4 mt-2 hidden";
+    const content = document.createElement("div");
+    content.className = "space-y-4 mt-2 hidden";
 
-  platosCat.forEach(plato => {
-    //const cantidad = getCantidadCarrito(plato.id);
-    const card = document.createElement("div");
-    card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
+    platosCat.forEach(plato => {
+      const card = document.createElement("div");
+      card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
 
-    card.innerHTML = `
-      <div>
-        <h3 class="font-bold">${plato.nombre}</h3>
-        <p class="text-sm">${plato.descripcion}</p>
-        <span class="text-blue-600 font-semibold">${plato.precio} €</span>
-      </div>
-      <div class="flex items-center gap-2 mt-2">
-        <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
-        <span id="contador-${plato.id}" class="w-6 text-center">${getCantidadCarrito(plato.id)}</span>
+      card.innerHTML = `
+        <div>
+          <h3 class="font-bold">${plato.nombre}</h3>
+          <p class="text-sm">${plato.descripcion}</p>
+          <span class="text-blue-600 font-semibold">${plato.precio} €</span>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
+          <span id="contador-${plato.id}" class="w-6 text-center font-bold transition duration-200"></span>
+          <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
+        </div>
+      `;
 
-        <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
-      </div>
-    `;
+      content.appendChild(card);
 
-    content.appendChild(card);
+      const contador = card.querySelector(`#contador-${plato.id}`);
+      if (contador) {
+        contador.innerText = getCantidadCarrito(plato.id);
+      }
+    });
+
+    header.addEventListener("click", () => {
+      content.classList.toggle("hidden");
+    });
+
+    section.appendChild(header);
+    section.appendChild(content);
+    contenedor.appendChild(section);
   });
-
-  header.addEventListener("click", () => {
-    content.classList.toggle("hidden");
-  });
-
-  section.appendChild(header);
-  section.appendChild(content);
-  contenedor.appendChild(section);
-});
-
 
   actualizarContador();
 }
@@ -131,7 +125,13 @@ function modificarCantidad(platoId, cambio, nombre = '', precio = 0) {
   localStorage.setItem("carrito", JSON.stringify(carrito));
 
   const contador = document.getElementById(`contador-${platoId}`);
-  if (contador) contador.innerText = getCantidadCarrito(platoId);
+  if (contador) {
+    contador.innerText = getCantidadCarrito(platoId);
+    contador.classList.add("bg-yellow-300", "text-black", "rounded", "px-1");
+    setTimeout(() => {
+      contador.classList.remove("bg-yellow-300", "text-black", "rounded", "px-1");
+    }, 300);
+  }
 
   actualizarContador();
 
@@ -147,6 +147,7 @@ function actualizarContador() {
   if (contador) contador.innerText = `${total} plato${total !== 1 ? 's' : ''} en el carrito`;
 }
 
+// ⬇️ LA FUNCIÓN QUE FALTABA: cargarCarrito
 async function cargarCarrito() {
   const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
   const contenedor = document.getElementById("carrito-items");
@@ -177,11 +178,10 @@ async function cargarCarrito() {
     div.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded shadow flex justify-between items-center";
 
     div.innerHTML = `
-  <div>
-    <h3 class="font-bold text-gray-900 dark:text-gray-100">${p.nombre}</h3>
-    <span class="text-gray-800 dark:text-gray-300">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
-  </div>
-
+      <div>
+        <h3 class="font-bold">${p.nombre}</h3>
+        <span class="text-gray-800 dark:text-gray-300">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
+      </div>
       <div class="flex items-center gap-2">
         <button onclick="modificarCantidad(${p.platoId}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
         <button onclick="modificarCantidad(${p.platoId}, 1, '${p.nombre}', ${p.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
@@ -200,24 +200,20 @@ async function cargarCarrito() {
   `;
 
   const btnPedido = document.getElementById("realizar-pedido");
+  const nuevoBtn = btnPedido.cloneNode(true);
+  btnPedido.parentNode.replaceChild(nuevoBtn, btnPedido);
 
-// Elimina listeners anteriores clonando el nodo
-const nuevoBtn = btnPedido.cloneNode(true);
-btnPedido.parentNode.replaceChild(nuevoBtn, btnPedido);
-
-// Asigna solo un listener nuevo
-nuevoBtn.addEventListener("click", async () => {
+  nuevoBtn.addEventListener("click", async () => {
     const carritoActual = JSON.parse(localStorage.getItem("carrito") || "[]");
-const platosIds = [];
-carritoActual.forEach(p => {
-  for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
-});
-
+    const platosIds = [];
+    carritoActual.forEach(p => {
+      for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
+    });
 
     const body = {
       numeroMesa: parseInt(mesaId),
       restauranteId: parseInt(restauranteId),
-      platos: platosIds,
+      platos: platosIds
     };
 
     try {
@@ -232,22 +228,16 @@ carritoActual.forEach(p => {
         const data = await res.json();
         const codigo = data.codigoPedido;
 
-        // Copiar automáticamente el código al portapapeles
-        try {
-          await navigator.clipboard.writeText(codigo);
-          // Mostrar animación flotante de "copiado"
-          const copiado = document.getElementById("copiado");
-          copiado.classList.remove("opacity-0");
-          copiado.classList.add("opacity-100");
-          
-          setTimeout(() => {
-            copiado.classList.remove("opacity-100");
-            copiado.classList.add("opacity-0");
-          }, 2000);
+        await navigator.clipboard.writeText(codigo);
+        const copiado = document.getElementById("copiado");
+        copiado.classList.remove("opacity-0");
+        copiado.classList.add("opacity-100");
 
-        } catch (err) {
-          console.warn("No se pudo copiar al portapapeles:", err);
-        }
+        setTimeout(() => {
+          copiado.classList.remove("opacity-100");
+          copiado.classList.add("opacity-0");
+        }, 2000);
+
         document.getElementById("sound-success").play();
 
         const modal = document.getElementById("modal");
@@ -275,4 +265,9 @@ carritoActual.forEach(p => {
       console.error("Excepción:", e);
     }
   });
+}
+
+// Activar cargarCarrito cuando todo esté cargado y definido
+if (window.location.pathname.includes("carrito.html")) {
+  document.addEventListener("DOMContentLoaded", cargarCarrito);
 }
