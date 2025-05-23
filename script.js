@@ -2,18 +2,19 @@ const API_URL = "https://stockwise.fly.dev/api";
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) {
+    // Borra los platos antes de recargar por si ya estaban cargados
     const contenedor = document.getElementById("platos-container");
     if (contenedor) contenedor.innerHTML = "";
 
-    cargarPlatos();
+    cargarPlatos(); // vuelve a cargar todo desde cero (con cantidad correcta)
     actualizarContador();
   }
 
   window.addEventListener("storage", (event) => {
-    if (event.key === "carrito") {
-      actualizarContador();
-    }
-  });
+  if (event.key === "carrito") {
+    actualizarContador(); // se ejecuta al modificar carrito en otra pestaña
+  }
+});
 
   if (window.location.pathname.includes("carrito.html")) cargarCarrito();
 });
@@ -34,76 +35,78 @@ async function cargarPlatos() {
   const platos = await res.json();
 
   const categorias = {
-    1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []
-  };
+  1: [], // Entrantes
+  2: [], // Pizzas
+  3: [], // Pastas
+  4: [], // Carnes
+  5: [], // Pescados
+  6: [], // Postres
+  7: []  // Bebidas
+};
 
-  const nombresCategorias = {
-    1: "Entrantes",
-    2: "Pizzas",
-    3: "Pastas",
-    4: "Carnes",
-    5: "Pescados",
-    6: "Postres",
-    7: "Bebidas"
-  };
+const nombresCategorias = {
+  1: "Entrantes",
+  2: "Pizzas",
+  3: "Pastas",
+  4: "Carnes",
+  5: "Pescados",
+  6: "Postres",
+  7: "Bebidas"
+};
 
-  platos.forEach(plato => {
-    const idCat = plato.categoria?.id;
-    if (categorias[idCat]) categorias[idCat].push(plato);
-  });
-
-  document.getElementById("loader")?.classList.add("hidden");
+platos.forEach(plato => {
+  const idCat = plato.categoria?.id;
+  if (categorias[idCat]) categorias[idCat].push(plato);
+});
+document.getElementById("loader").classList.add("hidden");
 
   const contenedor = document.getElementById("platos-container");
   Object.keys(categorias).forEach(id => {
-    const categoria = nombresCategorias[id];
-    const platosCat = categorias[id];
-    if (!platosCat.length) return;
+  const categoria = nombresCategorias[id];
+  const platosCat = categorias[id];
+  if (!platosCat || platosCat.length === 0) return;
 
-    const section = document.createElement("div");
-    section.classList.add("mb-6");
+  const section = document.createElement("div");
+  section.classList.add("mb-6");
 
-    const header = document.createElement("button");
-    header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
-    header.textContent = categoria;
+  const header = document.createElement("button");
+  header.className = "text-2xl font-semibold text-pink-600 mb-3 border-b pb-1 w-full text-left hover:text-pink-500 transition";
+  header.textContent = categoria;
 
-    const content = document.createElement("div");
-    content.className = "space-y-4 mt-2 hidden";
+  const content = document.createElement("div");
+  content.className = "space-y-4 mt-2 hidden";
 
-    platosCat.forEach(plato => {
-      const card = document.createElement("div");
-      card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
+  platosCat.forEach(plato => {
+    //const cantidad = getCantidadCarrito(plato.id);
+    const card = document.createElement("div");
+    card.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-lg shadow-lg border-l-4 border-blue-400 hover:shadow-xl transition-all duration-200";
 
-      card.innerHTML = `
-        <div>
-          <h3 class="font-bold">${plato.nombre}</h3>
-          <p class="text-sm">${plato.descripcion}</p>
-          <span class="text-blue-600 font-semibold">${plato.precio} €</span>
-        </div>
-        <div class="flex items-center gap-2 mt-2">
-          <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
-          <span id="contador-${plato.id}" class="w-6 text-center font-bold transition duration-200"></span>
-          <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
-        </div>
-      `;
+    card.innerHTML = `
+      <div>
+        <h3 class="font-bold">${plato.nombre}</h3>
+        <p class="text-sm">${plato.descripcion}</p>
+        <span class="text-blue-600 font-semibold">${plato.precio} €</span>
+      </div>
+      <div class="flex items-center gap-2 mt-2">
+        <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
+        <span id="contador-${plato.id}" class="w-6 text-center">${getCantidadCarrito(plato.id)}</span>
 
-      content.appendChild(card);
+        <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
+      </div>
+    `;
 
-      // Actualiza visualmente el contador al cargar
-      const contador = card.querySelector(`#contador-${plato.id}`);
-      if (contador) {
-        contador.innerText = getCantidadCarrito(plato.id);
-      }
-    });
-
-    header.addEventListener("click", () => {
-      content.classList.toggle("hidden");
-    });
-
-    section.appendChild(header);
-    section.appendChild(content);
-    contenedor.appendChild(section);
+    content.appendChild(card);
   });
+
+  header.addEventListener("click", () => {
+    content.classList.toggle("hidden");
+  });
+
+  section.appendChild(header);
+  section.appendChild(content);
+  contenedor.appendChild(section);
+});
+
 
   actualizarContador();
 }
@@ -128,13 +131,7 @@ function modificarCantidad(platoId, cambio, nombre = '', precio = 0) {
   localStorage.setItem("carrito", JSON.stringify(carrito));
 
   const contador = document.getElementById(`contador-${platoId}`);
-  if (contador) {
-    contador.innerText = getCantidadCarrito(platoId);
-    contador.classList.add("bg-yellow-300", "text-black", "rounded", "px-1");
-    setTimeout(() => {
-      contador.classList.remove("bg-yellow-300", "text-black", "rounded", "px-1");
-    }, 400);
-  }
+  if (contador) contador.innerText = getCantidadCarrito(platoId);
 
   actualizarContador();
 
@@ -157,11 +154,11 @@ async function cargarCarrito() {
   const { restauranteId, mesaId } = getParams();
 
   try {
-    const res = await fetch(${API_URL}/restaurantes/${restauranteId});
+    const res = await fetch(`${API_URL}/restaurantes/${restauranteId}`);
     const restaurante = await res.json();
-    document.getElementById("titulo-restaurante").innerText = ${restaurante.nombre} - Mesa ${mesaId};
+    document.getElementById("titulo-restaurante").innerText = `${restaurante.nombre} - Mesa ${mesaId}`;
   } catch (e) {
-    document.getElementById("titulo-restaurante").innerText = Mesa ${mesaId};
+    document.getElementById("titulo-restaurante").innerText = `Mesa ${mesaId}`;
   }
 
   if (carrito.length === 0) {
@@ -179,7 +176,7 @@ async function cargarCarrito() {
     const div = document.createElement("div");
     div.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded shadow flex justify-between items-center";
 
-    div.innerHTML = 
+    div.innerHTML = `
   <div>
     <h3 class="font-bold text-gray-900 dark:text-gray-100">${p.nombre}</h3>
     <span class="text-gray-800 dark:text-gray-300">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
@@ -189,18 +186,18 @@ async function cargarCarrito() {
         <button onclick="modificarCantidad(${p.platoId}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
         <button onclick="modificarCantidad(${p.platoId}, 1, '${p.nombre}', ${p.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
       </div>
-    ;
+    `;
 
     contenedor.appendChild(div);
   });
 
   const totalPlatos = carrito.reduce((sum, p) => sum + p.cantidad, 0);
-  document.getElementById("total-items").innerHTML = 
+  document.getElementById("total-items").innerHTML = `
     <div class="text-right">
       <div>${totalPlatos} plato${totalPlatos !== 1 ? 's' : ''} en el carrito</div>
       <div class="text-lg text-green-700 font-semibold">Total: ${totalEuros.toFixed(2)} €</div>
     </div>
-  ;
+  `;
 
   const btnPedido = document.getElementById("realizar-pedido");
 
@@ -224,7 +221,7 @@ carritoActual.forEach(p => {
     };
 
     try {
-      const res = await fetch(${API_URL}/pedidos/crear, {
+      const res = await fetch(`${API_URL}/pedidos/crear`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -254,7 +251,7 @@ carritoActual.forEach(p => {
         document.getElementById("sound-success").play();
 
         const modal = document.getElementById("modal");
-        modal.innerHTML = 
+        modal.innerHTML = `
           <div class="bg-white p-6 rounded shadow text-center max-w-md w-full mx-4">
             <h2 class="text-xl font-bold mb-3 text-green-600">✅ Pedido realizado correctamente</h2>
             <p class="text-gray-800">Tu código de pedido es:</p>
@@ -263,15 +260,15 @@ carritoActual.forEach(p => {
             <a href="pedido.html?codigo=${codigo}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mb-3">Ver Pedido</a>
             <p class="text-gray-500 text-sm">Redirigiendo al menú...</p>
           </div>
-        ;
+        `;
         modal.classList.remove("hidden");
 
         setTimeout(() => {
-          window.location.href = index.html?restaurante_id=${restauranteId}&mesa_id=${mesaId};
+          window.location.href = `index.html?restaurante_id=${restauranteId}&mesa_id=${mesaId}`;
         }, 5000);
       } else {
         const error = await res.text();
-        mensaje.innerText = ❌ Error al realizar el pedido: ${error};
+        mensaje.innerText = `❌ Error al realizar el pedido: ${error}`;
       }
     } catch (e) {
       mensaje.innerText = "❌ Error de conexión.";
