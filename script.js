@@ -2,9 +2,14 @@ const API_URL = "https://stockwise.fly.dev/api";
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) {
-  cargarPlatos();
-  actualizarContador(); // sincroniza con localStorage al volver del carrito
-}
+    // Borra los platos antes de recargar por si ya estaban cargados
+    const contenedor = document.getElementById("platos-container");
+    if (contenedor) contenedor.innerHTML = "";
+
+    cargarPlatos(); // vuelve a cargar todo desde cero (con cantidad correcta)
+    actualizarContador();
+  }
+
   window.addEventListener("storage", (event) => {
   if (event.key === "carrito") {
     actualizarContador(); // se ejecuta al modificar carrito en otra pestaña
