@@ -149,3 +149,133 @@ function actualizarContador() {
   const contador = document.getElementById("total-items");
   if (contador) contador.innerText = `${total} plato${total !== 1 ? 's' : ''} en el carrito`;
 }
+
+async function cargarCarrito() {
+  const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
+  const contenedor = document.getElementById("carrito-items");
+  const mensaje = document.getElementById("mensaje");
+  const { restauranteId, mesaId } = getParams();
+
+  try {
+    const res = await fetch(${API_URL}/restaurantes/${restauranteId});
+    const restaurante = await res.json();
+    document.getElementById("titulo-restaurante").innerText = ${restaurante.nombre} - Mesa ${mesaId};
+  } catch (e) {
+    document.getElementById("titulo-restaurante").innerText = Mesa ${mesaId};
+  }
+
+  if (carrito.length === 0) {
+    contenedor.innerHTML = "<p>No hay platos en el carrito.</p>";
+    document.getElementById("total-items").innerText = "";
+    return;
+  }
+
+  contenedor.innerHTML = "";
+  let totalEuros = 0;
+
+  carrito.forEach(p => {
+    totalEuros += p.precio * p.cantidad;
+
+    const div = document.createElement("div");
+    div.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded shadow flex justify-between items-center";
+
+    div.innerHTML = 
+  <div>
+    <h3 class="font-bold text-gray-900 dark:text-gray-100">${p.nombre}</h3>
+    <span class="text-gray-800 dark:text-gray-300">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
+  </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="modificarCantidad(${p.platoId}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
+        <button onclick="modificarCantidad(${p.platoId}, 1, '${p.nombre}', ${p.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
+      </div>
+    ;
+
+    contenedor.appendChild(div);
+  });
+
+  const totalPlatos = carrito.reduce((sum, p) => sum + p.cantidad, 0);
+  document.getElementById("total-items").innerHTML = 
+    <div class="text-right">
+      <div>${totalPlatos} plato${totalPlatos !== 1 ? 's' : ''} en el carrito</div>
+      <div class="text-lg text-green-700 font-semibold">Total: ${totalEuros.toFixed(2)} €</div>
+    </div>
+  ;
+
+  const btnPedido = document.getElementById("realizar-pedido");
+
+// Elimina listeners anteriores clonando el nodo
+const nuevoBtn = btnPedido.cloneNode(true);
+btnPedido.parentNode.replaceChild(nuevoBtn, btnPedido);
+
+// Asigna solo un listener nuevo
+nuevoBtn.addEventListener("click", async () => {
+    const carritoActual = JSON.parse(localStorage.getItem("carrito") || "[]");
+const platosIds = [];
+carritoActual.forEach(p => {
+  for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
+});
+
+
+    const body = {
+      numeroMesa: parseInt(mesaId),
+      restauranteId: parseInt(restauranteId),
+      platos: platosIds,
+    };
+
+    try {
+      const res = await fetch(${API_URL}/pedidos/crear, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        localStorage.removeItem("carrito");
+        const data = await res.json();
+        const codigo = data.codigoPedido;
+
+        // Copiar automáticamente el código al portapapeles
+        try {
+          await navigator.clipboard.writeText(codigo);
+          // Mostrar animación flotante de "copiado"
+          const copiado = document.getElementById("copiado");
+          copiado.classList.remove("opacity-0");
+          copiado.classList.add("opacity-100");
+          
+          setTimeout(() => {
+            copiado.classList.remove("opacity-100");
+            copiado.classList.add("opacity-0");
+          }, 2000);
+
+        } catch (err) {
+          console.warn("No se pudo copiar al portapapeles:", err);
+        }
+        document.getElementById("sound-success").play();
+
+        const modal = document.getElementById("modal");
+        modal.innerHTML = 
+          <div class="bg-white p-6 rounded shadow text-center max-w-md w-full mx-4">
+            <h2 class="text-xl font-bold mb-3 text-green-600">✅ Pedido realizado correctamente</h2>
+            <p class="text-gray-800">Tu código de pedido es:</p>
+            <p class="text-2xl font-mono text-purple-700 my-3">${codigo}</p>
+            <p class="text-sm text-gray-500 mb-4">Se ha copiado automáticamente al portapapeles</p>
+            <a href="pedido.html?codigo=${codigo}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mb-3">Ver Pedido</a>
+            <p class="text-gray-500 text-sm">Redirigiendo al menú...</p>
+          </div>
+        ;
+        modal.classList.remove("hidden");
+
+        setTimeout(() => {
+          window.location.href = index.html?restaurante_id=${restauranteId}&mesa_id=${mesaId};
+        }, 5000);
+      } else {
+        const error = await res.text();
+        mensaje.innerText = ❌ Error al realizar el pedido: ${error};
+      }
+    } catch (e) {
+      mensaje.innerText = "❌ Error de conexión.";
+      console.error("Excepción:", e);
+    }
+  });
+}
