@@ -162,10 +162,11 @@ async function cargarCarrito() {
     div.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded shadow flex justify-between items-center";
 
     div.innerHTML = `
-      <div>
-        <h3 class="font-bold">${p.nombre}</h3>
-        <span class="text-gray-700">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
-      </div>
+  <div>
+    <h3 class="font-bold text-gray-900 dark:text-gray-100">${p.nombre}</h3>
+    <span class="text-gray-800 dark:text-gray-300">Cantidad: <span id="contador-${p.platoId}" class="font-semibold">${p.cantidad}</span></span>
+  </div>
+
       <div class="flex items-center gap-2">
         <button onclick="modificarCantidad(${p.platoId}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
         <button onclick="modificarCantidad(${p.platoId}, 1, '${p.nombre}', ${p.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
