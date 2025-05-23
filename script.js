@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarPlatos();
   actualizarContador(); // sincroniza con localStorage al volver del carrito
 }
+  window.addEventListener("storage", (event) => {
+  if (event.key === "carrito") {
+    actualizarContador(); // se ejecuta al modificar carrito en otra pestaña
+  }
+});
 
   if (window.location.pathname.includes("carrito.html")) cargarCarrito();
 });
