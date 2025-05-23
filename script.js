@@ -192,10 +192,12 @@ btnPedido.parentNode.replaceChild(nuevoBtn, btnPedido);
 
 // Asigna solo un listener nuevo
 nuevoBtn.addEventListener("click", async () => {
-    const platosIds = [];
-    carrito.forEach(p => {
-      for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
-    });
+    const carritoActual = JSON.parse(localStorage.getItem("carrito") || "[]");
+const platosIds = [];
+carritoActual.forEach(p => {
+  for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
+});
+
 
     const body = {
       numeroMesa: parseInt(mesaId),
