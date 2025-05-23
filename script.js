@@ -184,7 +184,14 @@ async function cargarCarrito() {
     </div>
   `;
 
-  document.getElementById("realizar-pedido").addEventListener("click", async () => {
+  const btnPedido = document.getElementById("realizar-pedido");
+
+// Elimina listeners anteriores clonando el nodo
+const nuevoBtn = btnPedido.cloneNode(true);
+btnPedido.parentNode.replaceChild(nuevoBtn, btnPedido);
+
+// Asigna solo un listener nuevo
+nuevoBtn.addEventListener("click", async () => {
     const platosIds = [];
     carrito.forEach(p => {
       for (let i = 0; i < p.cantidad; i++) platosIds.push(p.platoId);
