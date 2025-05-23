@@ -1,7 +1,11 @@
 const API_URL = "https://stockwise.fly.dev/api";
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) cargarPlatos();
+  if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("index.html")) {
+  cargarPlatos();
+  actualizarContador(); // sincroniza con localStorage al volver del carrito
+}
+
   if (window.location.pathname.includes("carrito.html")) cargarCarrito();
 });
 
