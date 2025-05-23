@@ -159,7 +159,7 @@ async function cargarCarrito() {
     totalEuros += p.precio * p.cantidad;
 
     const div = document.createElement("div");
-    div.className = "bg-white p-4 rounded shadow flex justify-between items-center";
+    div.className = "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded shadow flex justify-between items-center";
 
     div.innerHTML = `
       <div>
