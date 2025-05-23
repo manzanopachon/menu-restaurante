@@ -84,7 +84,8 @@ document.getElementById("loader").classList.add("hidden");
       </div>
       <div class="flex items-center gap-2 mt-2">
         <button onclick="modificarCantidad(${plato.id}, -1)" class="bg-red-600 hover:bg-red-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">-</button>
-        <span id="contador-${plato.id}" class="w-6 text-center">${cantidad}</span>
+        <span id="contador-${plato.id}" class="w-6 text-center">${getCantidadCarrito(plato.id)}</span>
+
         <button onclick="modificarCantidad(${plato.id}, 1, '${plato.nombre}', ${plato.precio})" class="bg-green-600 hover:bg-green-700 hover:scale-110 transform text-white w-8 h-8 rounded-xl transition">+</button>
       </div>
     `;
