@@ -103,6 +103,14 @@ async function cargarPlatos() {
   });
 
   actualizarContador();
+
+  // ✅ Refrescar contadores visibles tras render completo
+const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
+carrito.forEach(p => {
+  const span = document.getElementById(`contador-${p.platoId}`);
+  if (span) span.innerText = p.cantidad;
+});
+
 }
 
 function getCantidadCarrito(platoId) {
