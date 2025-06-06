@@ -99,6 +99,12 @@
 
     async function buscarPedido() {
       const codigo = document.getElementById("codigo-input").value.trim().toUpperCase();
+
+      const params = new URLSearchParams(window.location.search);
+      params.set("codigo", codigo);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+      
       if (!codigo) return mostrarError("Introduce un código válido.");
 
       clearInterval(interval);
