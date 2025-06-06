@@ -41,7 +41,8 @@
   <!-- Contenido principal -->
   <div class="pt-12 px-4">
     <h1 id="restaurante-info" class="text-4xl font-bold italic mb-6 text-center text-orange-600 dark:text-orange-300 drop-shadow-md"></h1>
-    <a href="pedido.html" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition z-50">📦 Ver Pedido</a>
+    <a href="#" onclick="irAPedido()" class="fixed top-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition z-50">📦 Ver Pedido</a>
+
 
     <div id="platos-container" class="space-y-6 animate__animated animate__fadeIn"></div>
     <div class="pb-24"></div>
@@ -78,5 +79,20 @@
   </script>
 
   <script src="script.js"></script>
+
+  <script>
+  function irAPedido() {
+    const params = new URLSearchParams(window.location.search);
+    const restauranteId = params.get("restaurante_id");
+    const mesaId = params.get("mesa_id");
+
+    if (restauranteId && mesaId) {
+      window.location.href = `pedido.html?restaurante_id=${restauranteId}&mesa_id=${mesaId}`;
+    } else {
+      alert("No se han detectado los datos del restaurante o la mesa.");
+    }
+  }
+</script>
+
 </body>
 </html>
