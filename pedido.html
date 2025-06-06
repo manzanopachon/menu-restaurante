@@ -160,19 +160,34 @@
     }
 
    function llamarCamarero() {
-  const msg = document.getElementById("mensaje-camarero");
-  msg.classList.remove("hidden");
+    const params = new URLSearchParams(window.location.search);
+    const restauranteId = params.get("restaurante_id");
+    const mesaId = params.get("mesa_id");
 
-  // Reproducir sonido
-  const sonido = document.getElementById("llamada-sound");
-  if (sonido) {
-    sonido.currentTime = 0;
-    sonido.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+    if (!restauranteId || !mesaId) {
+      alert("No se ha detectado el restaurante o la mesa.");
+      return;
+    }
+
+    fetch(`${API_URL}/llamadas/crear?restauranteId=${restauranteId}&mesaId=${mesaId}`, {
+      method: "POST"
+    })
+      .then(() => {
+        const msg = document.getElementById("mensaje-camarero");
+        msg.classList.remove("hidden");
+
+        const sonido = document.getElementById("llamada-sound");
+        if (sonido) {
+          sonido.currentTime = 0;
+          sonido.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+        }
+
+        setTimeout(() => msg.classList.add("hidden"), 4000);
+      })
+      .catch(() => {
+        alert("❌ Error al llamar al camarero");
+      });
   }
-
-  // Ocultar mensaje después de 4 segundos
-  setTimeout(() => msg.classList.add("hidden"), 4000);
-}
 
   </script>
   <audio id="llamada-sound" src="https://www.myinstants.com/media/sounds/apple-pay.mp3" preload="auto"></audio>
