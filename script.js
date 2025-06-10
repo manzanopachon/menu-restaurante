@@ -233,7 +233,21 @@ async function cargarCarrito() {
 
       if (res.ok) {
         localStorage.removeItem("carrito");
-        const data = await res.json();
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          mensaje.innerText = "❌ Error al interpretar la respuesta del servidor.";
+          console.error("Error al parsear JSON:", e);
+          return;
+        }
+
+        // solo continúa si data y codigoPedido existen
+        if (!data || !data.codigoPedido) {
+          mensaje.innerText = "❌ La respuesta del servidor no es válida.";
+          console.error("Respuesta inesperada:", data);
+          return;
+        }
         const codigo = data.codigoPedido;
 
         await navigator.clipboard.writeText(codigo);
