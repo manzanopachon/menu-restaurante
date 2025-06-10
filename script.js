@@ -283,7 +283,7 @@ async function cargarCarrito() {
         mensaje.innerText = `❌ Error al realizar el pedido: ${error}`;
       }
     } catch (e) {
-      mensaje.innerText = "❌ Error de conexión.";
+      mensaje.innerText = "❌ Error de conexioooon.";
       console.error("Excepción:", e);
     }
   });
