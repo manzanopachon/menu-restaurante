@@ -250,7 +250,11 @@ async function cargarCarrito() {
         }
         const codigo = data.codigoPedido;
 
+       try {
         await navigator.clipboard.writeText(codigo);
+      } catch (e) {
+        console.warn("No se pudo copiar al portapapeles:", e);
+      }
         const copiado = document.getElementById("copiado");
         copiado.classList.remove("opacity-0");
         copiado.classList.add("opacity-100");
