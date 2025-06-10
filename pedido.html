@@ -168,7 +168,7 @@
    function llamarCamarero() {
     const params = new URLSearchParams(window.location.search);
     const restauranteId = params.get("restaurante_id");
-    const mesaId = params.get("id_mesa");
+    const mesaId = params.get("mesa_id");
 
     if (!restauranteId || !mesaId) {
       alert("No se ha detectado el restaurante o la mesa.");
