@@ -84,7 +84,7 @@
   function irAPedido() {
     const params = new URLSearchParams(window.location.search);
     const restauranteId = params.get("restaurante_id");
-    const mesaId = params.get("id_mesa");
+    const mesaId = params.get("mesa_id");
 
     if (restauranteId && mesaId) {
       window.location.href = `pedido.html?restaurante_id=${restauranteId}&id_mesa=${mesaId}`;
